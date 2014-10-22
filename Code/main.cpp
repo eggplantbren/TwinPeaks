@@ -19,7 +19,7 @@ int main()
 	}while(choice != 'o' && choice != 'a');
 	if(choice == 'o')
 	{
-		int result = system("rm logw_thinned.txt logw.txt sample.txt scalars_thinned.txt scalars.txt");
+		int result = system("rm sample_info.txt sample.txt scalars_thinned.txt scalars.txt");
 		if(result == 0)
 			cout<<"# Files removed."<<endl;
 		else
@@ -30,7 +30,7 @@ int main()
 	RandomNumberGenerator::initialise_instance();
 	RandomNumberGenerator::get_instance().set_seed(time(0));
 
-	for(int k=0; k<100; k++)
+	for(int k=0; k<1; k++)
 	{
 		Sampler<SimpleExample> s(8, 8*100, 2000, 5000);
 		s.initialise();

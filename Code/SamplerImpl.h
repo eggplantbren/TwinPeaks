@@ -4,14 +4,14 @@
  *********************************************************************/
 
 template<class Type>
-Sampler<Type>::Sampler(int num_particles, int num_steps,
+Sampler<Type>::Sampler(int num_particles, int num_iterations,
 				int mcmc_steps, int thin)
 :particles(num_particles)
 ,threshold(particles[0].get_scalars().size(), std::vector<double>(2))
-,num_steps(num_steps)
+,num_iterations(num_iterations)
 ,mcmc_steps(mcmc_steps)
 ,thin(thin)
-,iteration(0)
+,iteration(2)
 {
 
 }
@@ -32,42 +32,30 @@ void Sampler<Type>::initialise()
 		threshold[i][1] = 0.;
 	}
 
-	// Generate direction
-	direction.resize(particles[0].get_scalars().size());
-	double tot = 0.;
-	double sig = 5.*DNest3::randomU();
-	for(size_t i=0; i<direction.size(); i++)
-	{
-		direction[i] = exp(sig*DNest3::randn());
-		tot += direction[i];
-	}
-	for(size_t i=0; i<direction.size(); i++)
-		direction[i] /= tot;
+	iteration[0] = 0; iteration[1] = 0;
+	switch_time = DNest3::randInt(num_iterations);
 }
 
 template<class Type>
 void Sampler<Type>::update()
 {
 	// Open files
-	std::fstream logw_file("logw.txt", std::ios::out|std::ios::app);
+	std::fstream sample_info_file("sample_info.txt", std::ios::out|std::ios::app);
 	std::fstream scalars_file("scalars.txt", std::ios::out|std::ios::app);
 	std::fstream scalars_thinned_file("scalars_thinned.txt", std::ios::out|std::ios::app);
-	std::fstream logw_thinned_file("logw_thinned.txt", std::ios::out|std::ios::app);
 	std::fstream sample_file("sample.txt", std::ios::out|std::ios::app);
 
 	// Choose a scalar
-	int which_scalar;
-	do
-	{
-		which_scalar = DNest3::randInt(threshold.size());
-	}while(DNest3::randomU() >= direction[which_scalar]);
+	int which_scalar = (iteration[0] < switch_time)?(0):(1);
+
+	iteration[which_scalar] += 1;
 
 	// Find worst particle
 	int worst = find_worst(which_scalar);
 
-	// Write out its prior weight and scalars
-	double logw = -(double)(iteration+1)/particles.size();//*log((double)particles.size()/(particles.size()+1));
-	logw_file<<logw<<std::endl;
+	// Write out its info and scalars
+	sample_info_file<<particles.size()<<' ';
+	sample_info_file<<iteration[0]<<' '<<iteration[1]<<std::endl;
 
 	// Save to thinned files with probability 1/thin
 	if(DNest3::randomU() <= 1./thin)
@@ -75,42 +63,31 @@ void Sampler<Type>::update()
 		for(size_t i=0; i<particles[worst].get_scalars().size();  i++)
 			scalars_thinned_file<<particles[worst].get_scalars()[i]<<' ';
 		scalars_thinned_file<<std::endl;
-		logw_thinned_file<<logw<<std::endl;
 		sample_file<<particles[worst]<<std::endl;
 	}
 
 	// Close files
-	logw_file.close();
-	scalars_thinned_file.close(); logw_thinned_file.close(); sample_file.close();
+	sample_info_file.close();
+	scalars_thinned_file.close(); sample_file.close();
 
 	// Set the new threshold
 	threshold[which_scalar][0] = particles[worst].get_scalars()[which_scalar];
 	threshold[which_scalar][1] = particles[worst].get_tiebreakers()[which_scalar];
 
-	std::cout<<"# Iteration "<<(iteration+1)<<" of run with direction = (";
-	for(size_t i=0; i<direction.size(); i++)
-	{
-		std::cout<<direction[i];
-		if(i == direction.size() - 1)
-			std::cout<<")."<<std::endl;
-		else
-			std::cout<<", ";
-	}
-
+	std::cout<<"# Iteration "<<(iteration[0] + iteration[1])<<"/"<<num_iterations<<".";
+	std::cout<<std::endl;
 	
-	for(size_t i=0; i<threshold.size();  i++)
-		scalars_file<<threshold[i][0]<<' ';
+	for(size_t i=0; i<particles[worst].get_scalars().size();  i++)
+		scalars_file<<particles[worst].get_scalars()[i]<<' ';
 	scalars_file<<std::endl;
 	scalars_file.close();
 
-	std::cout<<"# logw = "<<logw<<", threshold = (";
-	for(size_t i=0; i<threshold.size(); i++)
-	{
-		std::cout<<threshold[i][0];
-		if(i != (threshold.size()-1))
-			std::cout<<", ";
-	}
-	std::cout<<")."<<std::endl;
+	double logX = -(double)(iteration[0])/particles.size();
+	double logY = -(double)(iteration[1])/particles.size();
+
+	std::cout<<"# (logX, logY) ~= ("<<logX<<", "<<logY<<"), scalars = (";
+	std::cout<<particles[worst].get_scalars()[0]<<", ";
+	std::cout<<particles[worst].get_scalars()[1]<<")."<<std::endl;
 	std::cout<<"# Evolving...";
 
 	// Copy a survivor
@@ -140,14 +117,12 @@ void Sampler<Type>::update()
 	}
 	std::cout<<"done. Accepted "<<accepts<<"/"<<mcmc_steps<<".";
 	std::cout<<std::endl<<std::endl<<std::endl;
-
-	iteration++;
 }
 
 template<class Type>
 void Sampler<Type>::run()
 {
-	for(int i=0; i<num_steps; i++)
+	for(int i=0; i<num_iterations; i++)
 		update();
 }
 
