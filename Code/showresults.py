@@ -15,6 +15,14 @@ sample_info = sample_info[0:smallest, :]
 num_runs = sum(sample_info[:,1] == 1)
 print('Number of runs = {n}.'.format(n=num_runs))
 
+# Assign a run identity to each point
+run_id = zeros(sample_info.shape[0]).astype('int')
+for i in xrange(1, sample_info.shape[0]):
+  if sum(sample_info[i, 1:]) == 1:
+    run_id[i] = run_id[i-1] + 1
+  else:
+    run_id[i] = run_id[i-1]
+
 # Simulate logX values but only for points with logY=0
 which = sample_info[:,2] == 0
 _scalars = scalars[which, :].copy()
