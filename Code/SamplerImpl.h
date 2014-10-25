@@ -33,7 +33,7 @@ void Sampler<Type>::initialise()
 	}
 
 	iteration[0] = 0; iteration[1] = 0;
-	switch_time = DNest3::randInt(num_iterations);
+	switch_time = 1 + DNest3::randInt(num_iterations - 1);
 }
 
 template<class Type>
