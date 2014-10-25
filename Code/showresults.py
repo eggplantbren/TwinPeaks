@@ -43,9 +43,6 @@ for i in xrange(0, sample_info.shape[0]):
   else:
     print('# This shouldn\'t happen.')
 
-plot(logX[logY==0], scalars[logY==0,0], 'b.')
-show()
-
 # Sort subset of points with logY = 0.
 which = logY == 0.
 logX_sorted = logX[which].copy()
@@ -68,6 +65,14 @@ for i in xrange(0, sample_info.shape[0]):
   where = nonzero(where)[0]
   logX_new[i] = logX_sorted[where]
 
-plot(logX_new[logY==0], scalars[logY==0,0], 'b.')
+# Don't need old logX assignments anymore
+logX = logX_new
+
+# Clothesline plot
+plot(logX, logY, 'b.', markersize=1)
+xlim([1.05*logX.min(), -0.05*logX.min()])
+ylim([1.05*logY.min(), -0.05*logY.min()])
+xlabel(r'$\log(X)$', fontsize=16)
+ylabel(r'$\log(Y)$', fontsize=16)
 show()
 
