@@ -97,3 +97,48 @@ def logdiffexp(x1, x2):
   result = log(exp(xx1) - exp(xx2)) + biggest
   return result
 
+
+log_dx = empty(scalars.shape[0])
+log_dy = empty(scalars.shape[0])
+for i in xrange(0, scalars.shape[0]):
+  # Find points to the left and right
+  left = nonzero(logX < logX[i])[0]
+  right = nonzero(logX > logX[i])[0]
+  # Find neighbours
+  if len(left) != 0:
+    nearest_left = logX[left].max()
+  else:
+    nearest_left = logX[i]
+  if len(right) != 0:
+    nearest_right = logX[right].min()
+  else:
+    nearest_right = logX[i]
+  log_dx[i] = logdiffexp(nearest_right, nearest_left) - log(2.)
+
+  # Find points above and below
+  below = nonzero(logical_and(logX == logX[i], logY < logY[i]))[0]
+  above = nonzero(logical_and(logX == logX[i], logY > logY[i]))[0]
+  # Find neighbours
+  if len(below) != 0:
+    nearest_below = logY[below].max()
+  else:
+    nearest_below = logY[i]
+  if len(above) != 0:
+    nearest_above = logY[above].min()
+  else:
+    nearest_above = logY[i]
+  log_dy[i] = logdiffexp(nearest_above, nearest_below) - log(2.)
+
+# Calculate a normalising constant
+T1, T2 = 0.1, 1.
+logL = scalars[:,0]/T1 + scalars[:,1]/T2
+
+log_dx -= logsumexp(log_dx)
+log_dy -= logsumexp(log_dy)
+
+# Calculate prior weights and normalise
+logprior = log_dx + log_dy
+logprior -= logsumexp(logprior)
+logZ = logsumexp(logprior + logL)
+print('logZ = {logZ}'.format(logZ=logZ))
+
