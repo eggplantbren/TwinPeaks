@@ -61,12 +61,18 @@ for i in xrange(0, sample_info.shape[0]):
 
   # Find the ancestor's scalars in scalars_sorted
   where = logical_and(scalars_sorted[:,0] == ancestor[0],\
-			scalars_sorted[:,1] == ancestor[1])
+      scalars_sorted[:,1] == ancestor[1])
   where = nonzero(where)[0]
   logX_new[i] = logX_sorted[where]
 
 # Don't need old logX assignments anymore
 logX = logX_new
+
+# Delete logY=0 points
+keep = nonzero(logY != 0)[0]
+logX = logX[keep]
+logY = logY[keep]
+scalars = scalars[keep, :]
 
 # Clothesline plot
 plot(logX, logY, 'b.', markersize=1)
@@ -75,4 +81,19 @@ ylim([1.05*logY.min(), -0.05*logY.min()])
 xlabel(r'$\log(X)$', fontsize=16)
 ylabel(r'$\log(Y)$', fontsize=16)
 show()
+
+# Define some useful functions
+# for doing the integrals
+def logsumexp(values):
+  biggest = max(values)
+  x = values - biggest
+  result = log(sum(exp(x))) + biggest
+  return result
+
+def logdiffexp(x1, x2):
+  biggest = x1
+  xx1 = x1 - biggest
+  xx2 = x2 - biggest
+  result = log(exp(xx1) - exp(xx2)) + biggest
+  return result
 
