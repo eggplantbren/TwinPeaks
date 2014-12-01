@@ -3,7 +3,7 @@ from postprocess import logsumexp
 
 output = atleast_2d(loadtxt('output.txt'))
 
-w = exp(output[:,0] - output[:,0].max())
+w = ones(output.shape[0])#exp(output[:,0] - output[:,0].max())
 w /= w.sum()
 logw = log(w + 1E-300)
 
