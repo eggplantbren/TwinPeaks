@@ -2,6 +2,7 @@
 /*********************************************************************
  *			IMPLEMENTATIONS BEGIN			     *
  *********************************************************************/
+#include "Utils.h"
 
 template<class Type>
 Sampler<Type>::Sampler(int num_particles, int num_steps,
@@ -68,7 +69,12 @@ void Sampler<Type>::update()
 	int worst = find_worst(which_scalar);
 
 	// Write out its prior weight and scalars
-	double logw = -(double)(iteration+1)/particles.size();//*log((double)particles.size()/(particles.size()+1));
+	double logw;
+	if(iteration == 0)
+		logw = -log(particles.size());
+	else
+		logw = DNest3::logdiffexp((iteration-1)*log(1. - 1./particles.size()),
+									iteration*log(1. - 1./particles.size()));
 	logw_file<<logw<<std::endl;
 
 	// Save to thinned files with probability 1/thin

@@ -32,7 +32,7 @@ int main()
 
 	for(int k=0; k<10; k++)
 	{
-		Sampler<SimpleExample> s(1, 1*120, 30000, 5000);
+		Sampler<SimpleExample> s(10, 10*120, 30000, 5000);
 		s.initialise();
 		s.run();
 	}
