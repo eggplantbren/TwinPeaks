@@ -12,7 +12,7 @@ class Sampler
     private:
 
         // Constants here for now
-        static constexpr int num_particles = 100;
+        static constexpr int num_particles = 101;
         static constexpr int mcmc_steps = 1000;
 
         std::vector<double> direction;
@@ -23,6 +23,9 @@ class Sampler
 
         // Initialise
         Sampler(Tools::RNG& rng);
+
+        // Update
+        void update(Tools::RNG& rng);
 
 };
 
