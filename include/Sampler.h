@@ -1,6 +1,7 @@
 #ifndef TwinPeaks_Sampler_h
 #define TwinPeaks_Sampler_h
 
+#include "Database.h"
 #include <vector>
 
 namespace TwinPeaks
@@ -14,6 +15,9 @@ class Sampler
         // Constants here for now
         static constexpr int num_particles = 101;
         static constexpr int mcmc_steps = 1000;
+
+        // Output database
+        Database database;
 
         std::vector<double> direction;
         std::vector<T> particles;

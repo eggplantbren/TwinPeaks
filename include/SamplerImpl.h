@@ -45,8 +45,8 @@ void Sampler<T>::update(Tools::RNG& rng)
 {
     std::cout << "Updating sampler." << std::endl;
 
-    std::cout << "Choosing scalar..." << std::flush;
     // Choose the relevant scalar
+    std::cout << "Choosing scalar..." << std::flush;
     int which_scalar;
     while(true)
     {
@@ -56,7 +56,16 @@ void Sampler<T>::update(Tools::RNG& rng)
     }
     std::cout << which_scalar << std::endl;
 
-
+    // Sort the particles
+    std::vector<double> s(num_particles);
+    std::vector<double> indices(num_particles);
+    for(int i=0; i<num_particles; ++i)
+    {
+        indices[i] = i;
+        s[i] = scalars[i][which_scalar];
+    }
+    std::sort(indices.begin(), indices.end(),
+                [&](int i, int j){ return(s[i] < s[j]); });
 }
 
 } // namespace

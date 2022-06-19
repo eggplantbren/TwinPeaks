@@ -11,6 +11,11 @@ class Database
     private:
         sqlite::database db;
 
+        void reset_tables();
+
+    public:
+        Database();
+
 
 };
 
