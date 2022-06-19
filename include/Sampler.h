@@ -15,6 +15,7 @@ class Sampler
         static constexpr int num_particles = 100;
         static constexpr int mcmc_steps = 1000;
 
+        std::vector<double> direction;
         std::vector<T> particles;
         std::vector<std::vector<double>> scalars;
 
