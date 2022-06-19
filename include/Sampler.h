@@ -23,6 +23,7 @@ class Sampler
         std::vector<double> direction;
         std::vector<T> particles;
         std::vector<std::vector<double>> scalars;
+        std::vector<double> threshold;
 
     public:
 

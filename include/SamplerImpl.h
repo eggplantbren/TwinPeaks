@@ -36,6 +36,7 @@ Sampler<T>::Sampler(Tools::RNG& rng)
         d /= max;
         std::cout << d << ' ';
     }
+    threshold = std::vector<double>(direction.size(), -1E300);
 
     std::cout << '\n' << std::endl;
 }
@@ -75,6 +76,13 @@ void Sampler<T>::update(Tools::RNG& rng)
         database.save_particle(particles[indices[i]].to_string(),
                                scalars[indices[i]]);
     }
+
+    // Set threshold
+    threshold[which_scalar] = scalars[indices[num_particles/2]][which_scalar];
+    std::cout << "New threshold: ";
+    for(double t: threshold)
+        std::cout << t << ' ';
+    std::cout << std::endl;
 }
 
 } // namespace
