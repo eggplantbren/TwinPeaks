@@ -2,6 +2,7 @@
 #define TwinPeaks_Database_h
 
 #include "sqlite_modern_cpp/hdr/sqlite_modern_cpp.h"
+#include <string>
 
 namespace TwinPeaks
 {
@@ -15,6 +16,9 @@ class Database
 
     public:
         Database();
+
+        void save_particle(const std::string& s,
+                           const std::vector<double>& scalars);
 
 
 };

@@ -10,6 +10,7 @@ namespace TwinPeaks
 
 template<typename T>
 Sampler<T>::Sampler(Tools::RNG& rng)
+:iteration(0)
 {
     assert(num_particles % 2 == 1);
 
@@ -43,7 +44,8 @@ Sampler<T>::Sampler(Tools::RNG& rng)
 template<typename T>
 void Sampler<T>::update(Tools::RNG& rng)
 {
-    std::cout << "Updating sampler." << std::endl;
+    ++iteration;
+    std::cout << "Iteration " << iteration << ": Updating sampler." << std::endl;
 
     // Choose the relevant scalar
     std::cout << "Choosing scalar..." << std::flush;
@@ -66,6 +68,13 @@ void Sampler<T>::update(Tools::RNG& rng)
     }
     std::sort(indices.begin(), indices.end(),
                 [&](int i, int j){ return(s[i] < s[j]); });
+
+    // Save all particles below the median
+    for(int i=0; i<num_particles/2; ++i)
+    {
+        database.save_particle(particles[indices[i]].to_string(),
+                               scalars[indices[i]]);
+    }
 }
 
 } // namespace

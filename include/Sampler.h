@@ -19,6 +19,7 @@ class Sampler
         // Output database
         Database database;
 
+        int iteration;
         std::vector<double> direction;
         std::vector<T> particles;
         std::vector<std::vector<double>> scalars;
