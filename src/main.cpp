@@ -7,7 +7,9 @@ int main()
 {
     Tools::RNG rng;
     Sampler<Example> sampler(rng);
-    sampler.update(rng);
+
+    for(int i=0; i<100; ++i)
+        sampler.update(rng);
 
     return 0;
 }

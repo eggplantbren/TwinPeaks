@@ -2,6 +2,7 @@
 #define TwinPeaks_Sampler_h
 
 #include "Database.h"
+#include "Tools/RNG.hpp"
 #include <vector>
 
 namespace TwinPeaks
@@ -24,6 +25,9 @@ class Sampler
         std::vector<T> particles;
         std::vector<std::vector<double>> scalars;
         std::vector<double> threshold;
+
+        // Do MCMC
+        void do_mcmc(int k, Tools::RNG& rng);
 
     public:
 

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <iostream>
+#include "Misc.h"
 
 namespace TwinPeaks
 {
@@ -83,6 +84,41 @@ void Sampler<T>::update(Tools::RNG& rng)
     for(double t: threshold)
         std::cout << t << ' ';
     std::cout << std::endl;
+
+    // Refresh particles
+    std::cout << "Refreshing particles..." << std::flush;
+    for(int i=0; i<num_particles/2; ++i)
+    {
+        int copy = rng.rand_int(num_particles/2 + 1) + num_particles/2;
+        copy = indices[copy];
+
+        particles[indices[i]] = particles[copy];
+        scalars[indices[i]] = scalars[copy];
+        do_mcmc(indices[i], rng);
+    }
+    std::cout << "done." << std::endl;
+
+
+}
+
+
+template<typename T>
+void Sampler<T>::do_mcmc(int k, Tools::RNG& rng)
+{
+    for(int i=0; i<mcmc_steps; ++i)
+    {
+        T proposal = particles[k];
+        double logh = proposal.perturb(rng);
+        if(rng.rand() <= exp(logh))
+        {
+            auto proposal_scalars = proposal.scalars();
+            if(all_above(proposal_scalars, threshold))
+            {
+                particles[k] = proposal;
+                scalars[k] = proposal_scalars;
+            }
+        }
+    }
 }
 
 } // namespace
